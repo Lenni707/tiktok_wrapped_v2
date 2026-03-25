@@ -9,13 +9,14 @@ pub struct User {
     pub profile: Profile,
     // likes: Likes,
     // comments: Comments,
-    // activity: Activity
+    pub activity: Activity
 }
 
 impl User {
     pub fn new(data: &Value) -> Self {
         User {
-            profile: Profile::new(data)
+            profile: Profile::new(data),
+            activity: Activity::new(data)
         }
     }
 }
