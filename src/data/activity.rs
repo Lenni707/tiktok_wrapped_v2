@@ -111,9 +111,3 @@ pub fn get_watch_sessions(data: &Value)-> Vec<WatchSession> {
         }
         watch_list
 }
-
-// -- TODO --
-// durch weatch hisotry loopen
-// dann die zeit rausfiltern und convertern (parser in helper func)
-// anschließend durch alle zeiten loopen und miteinander vergliechen
-// wenn abstand zwischen angeschauten videos >5 min oder so endet eine watch session (eignes struct für jede watchsession mit date watched und watch time (alle abstände der zeiten addiert in der session)) und allees gepseichert im einen array
