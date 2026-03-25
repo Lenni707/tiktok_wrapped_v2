@@ -1,18 +1,27 @@
+use std::default;
+
 use serde_json::Value;
-use time::{PrimitiveDateTime, Duration};
+use time::{PrimitiveDateTime, Duration, OffsetDateTime};
+use time::macros::{date, time};
 
 use crate::helper_func::string_to_time;
 
 pub struct Activity {
-    pub watch_sessions: Vec<WatchSession>
+    pub watch_sessions_overall: Vec<WatchSession>,
+    pub num_watch_sessions_one_year: usize,
+    pub longest_watch_session: WatchSession,
+    pub watch_time_secs: f32,
+    pub vids_watched: usize,
+    pub average_time_per_vid: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WatchSession {
     pub duration: Duration,
     pub start: PrimitiveDateTime, // for on which day u watched tiktok the most
     pub end: PrimitiveDateTime, // for coolness when debuggin
-    pub vids_watched: usize
+    pub vids_watched: usize,
+    pub average_time_per_vid:f32
 }
 
 impl WatchSession {
@@ -21,8 +30,9 @@ impl WatchSession {
         let end = session[session.len() - 1];
         let duration = end - start;
         let vids_watched = session.len();
+        let average_time_per_vid = duration.as_seconds_f32() / vids_watched as f32;
 
-        WatchSession { duration, start, end, vids_watched }
+        WatchSession { duration, start, end, vids_watched, average_time_per_vid }
     }
 }
 
@@ -30,8 +40,33 @@ impl Activity {
     pub fn new(data: &Value) -> Self {
         let watch_sessions = get_watch_sessions(data);
 
+        let mut watch_time: Duration = Duration::new(0, 0);
+        let mut vids_watched: usize = 0;
+        let mut longest_watch: WatchSession = WatchSession { duration: Duration::default(), start: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), end: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), vids_watched: 0, average_time_per_vid: 0.}; // so dumm
+        let mut num_watch_sessions_one_year: usize = 0;
+
+        let mut added_avg_of_time_per_vide_per_watch_session: f32 = 0.;
+
+        for i in &watch_sessions {
+            if i.start <  watch_sessions.last().expect("no last wtf").start - Duration::days(365) { // if its longe ago than year: problem data has to be fresh or the current date doesnt work
+                continue;
+            }
+            num_watch_sessions_one_year += 1;
+            watch_time += i.duration;
+            vids_watched += i.vids_watched;
+            added_avg_of_time_per_vide_per_watch_session += i.average_time_per_vid;
+            if i.duration > longest_watch.duration {
+                longest_watch = i.clone(); // weil ich ein fauler sack bin
+            }
+        }
+
         Activity {
-            watch_sessions
+            watch_sessions_overall: watch_sessions,
+            num_watch_sessions_one_year,
+            longest_watch_session: longest_watch,
+            watch_time_secs: watch_time.as_seconds_f32(),
+            vids_watched,
+            average_time_per_vid: added_avg_of_time_per_vide_per_watch_session / num_watch_sessions_one_year as f32
         }
     }
 }
@@ -57,7 +92,7 @@ pub fn get_watch_sessions(data: &Value)-> Vec<WatchSession> {
                     match prev_date {
                         None => { last_session.push(curr_date); }
                         Some(prev) => {
-                            if curr_date - prev < Duration::new(300, 0) {
+                            if curr_date - prev < Duration::new(240, 0) { // adjust for break between vids watched to count as new watch session
                                 last_session.push(curr_date)
                             }
                             else {
