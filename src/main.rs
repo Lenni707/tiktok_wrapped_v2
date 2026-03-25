@@ -4,8 +4,10 @@ use std::collections::HashSet;
 use serde_json::Value;
 
 mod data;
-
 use data::user::User;
+
+mod helper_func;
+use crate::helper_func::string_to_time;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let file = File::open("user_data_tiktok.json")?;
@@ -16,7 +18,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let user = User::new(&data);
 
-    println!("{:?}", get_keys(&data["Your Activity"]["Login History"]["LoginHistoryList"][0]));
+    let test = data["Your Activity"]["Watch History"]["VideoList"][0]["Date"].as_str().expect("didnt work");
+
+    let converted_test = string_to_time(test);
+
+    println!("{}", converted_test);
+
+    // println!("{:?}", &data["Your Activity"]["Watch History"]["VideoList"][0]);
 
     drop(data); // disposes of the data to safe memory. Maybe dumm aber ich kopiere für mein eigenes immer aus dem originalen raus
 
