@@ -70,7 +70,6 @@ pub fn get_watch_sessions(data: &Value)-> Vec<WatchSession> {
                     prev_date = Some(curr_date);
                 }
             }
-
             if !last_session.is_empty() {
                 watch_list.push(WatchSession::new(std::mem::take(&mut last_session)));
             }

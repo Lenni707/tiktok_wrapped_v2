@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::BufReader;
 use std::collections::HashSet;
+use std::time::Duration;
 use serde_json::Value;
 
 mod data;
@@ -17,7 +18,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let user = User::new(&data);
 
-    println!("{:?}", user.activity.watch_sessions[111]);
+    println!("You had {:?} individual watch sessions", user.activity.watch_sessions.len());
+
+    let mut whole_time: Duration = Duration::new(0, 0);
+
+    for i in user.activity.watch_sessions {
+        whole_time += i.duration
+    }
+
+    println!("You spend approximently {:?} Days on TikTok", whole_time.as_secs_f32() / 60. / 60./ 24.);
 
     // println!("{:?}", &data["Your Activity"]["Watch History"]["VideoList"][1]);
 
