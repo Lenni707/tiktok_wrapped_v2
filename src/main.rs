@@ -1,22 +1,29 @@
-use serde_json::{Value};
 use std::fs::File;
+use std::io::BufReader;
 use std::collections::HashSet;
+use serde_json::Value;
 
+mod data;
 
-// -- TODO --
-// > krasse Rekursion um immer deeper zu diggen
-// > alle daten aufsplitten um einzeln zu verarbeiten
-// > wenn bei alle geguckten videos, mit zeit in watchsessions aufteilen
+use data::user::User;
 
-fn main() {
-    
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let file = File::open("user_data_tiktok.json")?;
+    // iwie schneller oder
+    let reader = BufReader::new(file);
+
+    let data: Value = serde_json::from_reader(reader)?;
+
+    let user = User::new(&data);
+
+    println!("{:?}", get_keys(&data["Your Activity"]["Login History"]["LoginHistoryList"][0]));
+
+    drop(data); // disposes of the data to safe memory. Maybe dumm aber ich kopiere für mein eigenes immer aus dem originalen raus
+
+    Ok(())
 }
 
-fn get_top_keys(v: &Value) -> HashSet<String> {
+fn get_keys(v: &Value) -> HashSet<String> {
     let map = v.as_object().expect("expect so abfuck");
     map.keys().cloned().collect() // .cloned macht aus &String -> String, .collect ist goated und bildet aus igerator (map.keys()), was festes wie HashSet (HashSet wegen Return type)
 }
-
-// fn get_specific_values() -> Vec<_> {
-
-// }
