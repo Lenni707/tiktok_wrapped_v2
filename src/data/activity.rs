@@ -99,7 +99,7 @@ pub fn get_watch_sessions(data: &Value)-> HashMap<PrimitiveDateTime, WatchSessio
                     match prev_date {
                         None => { last_session.push(curr_date); }
                         Some(prev) => {
-                            if curr_date - prev < Duration::new(240, 0) { // adjust for break between vids watched to count as new watch session
+                            if (curr_date - prev).abs() < Duration::new(240, 0) { // adjust for break between vids watched to count as new watch session
                                 last_session.push(curr_date)
                             }
                             else {
