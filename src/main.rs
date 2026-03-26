@@ -18,7 +18,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let user = User::new(&data);
 
-    taunt(user);
+    // taunt(user);
+
+    println!("{:?} {}", user.activity.most_time_spend_on_tiktok_day.0, user.activity.most_time_spend_on_tiktok_day.1.as_seconds_f32() / 60. / 60.);
+
+    println!("{:?}", user.activity.most_watch_sessions_per_day);
 
     // println!("{:?}", &data["Your Activity"]["Watch History"]["VideoList"][1]); // for later expansion of data that gets processed
 
