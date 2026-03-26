@@ -10,7 +10,7 @@ use data::user::User;
 mod helper_func;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let file = File::open("user_data_tiktok.json")?;
+    let file = File::open("../user_data_tiktok.json")?;
     // iwie schneller oder
     let reader = BufReader::new(file);
 

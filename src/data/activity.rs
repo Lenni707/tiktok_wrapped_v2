@@ -1,4 +1,5 @@
 use std::default;
+use std::collections::HashMap;
 
 use serde_json::Value;
 use time::{PrimitiveDateTime, Duration, OffsetDateTime};
@@ -7,7 +8,7 @@ use time::macros::{date, time};
 use crate::helper_func::string_to_time;
 
 pub struct Activity {
-    pub watch_sessions_overall: Vec<WatchSession>,
+    pub watch_sessions_overall: HashMap<PrimitiveDateTime, WatchSession>,
     pub num_watch_sessions_one_year: usize,
     pub longest_watch_session: WatchSession,
     pub watch_time_secs: f32,
@@ -47,16 +48,21 @@ impl Activity {
 
         let mut added_avg_of_time_per_vide_per_watch_session: f32 = 0.;
 
-        for i in &watch_sessions {
-            if i.start <  watch_sessions.last().expect("no last wtf").start - Duration::days(365) { // if its longe ago than year: problem data has to be fresh or the current date doesnt work
+        let cutoff = watch_sessions.values()
+            .map(|s| s.start)
+            .max()
+            .unwrap() - Duration::days(365);
+
+        for (date, watch_session) in &watch_sessions {
+            if *date < cutoff { // if its longe ago than year: problem data has to be fresh or the current date doesnt work
                 continue;
             }
             num_watch_sessions_one_year += 1;
-            watch_time += i.duration;
-            vids_watched += i.vids_watched;
-            added_avg_of_time_per_vide_per_watch_session += i.average_time_per_vid;
-            if i.duration > longest_watch.duration {
-                longest_watch = i.clone(); // weil ich ein fauler sack bin
+            watch_time += watch_session.duration;
+            vids_watched += watch_session.vids_watched;
+            added_avg_of_time_per_vide_per_watch_session += watch_session.average_time_per_vid;
+            if watch_session.duration > longest_watch.duration {
+                longest_watch = watch_session.clone(); // weil ich ein fauler sack bin
             }
         }
 
@@ -71,8 +77,9 @@ impl Activity {
     }
 }
 
-pub fn get_watch_sessions(data: &Value)-> Vec<WatchSession> { 
-        let mut watch_list: Vec<WatchSession> = Vec::new();
+pub fn get_watch_sessions(data: &Value)-> HashMap<PrimitiveDateTime, WatchSession> { 
+        let watch_list: Vec<WatchSession> = Vec::new();
+        let mut watch_history_hash: HashMap<PrimitiveDateTime, WatchSession> = HashMap::new();
         let mut last_session: Vec<PrimitiveDateTime> = Vec::new();
 
         let watch_history = data // type Value::Array
@@ -97,7 +104,7 @@ pub fn get_watch_sessions(data: &Value)-> Vec<WatchSession> {
                             }
                             else {
                                 if !last_session.is_empty() {
-                                    watch_list.push(WatchSession::new(std::mem::take(&mut last_session)));
+                                    watch_history_hash.insert(last_session[0],WatchSession::new(std::mem::take(&mut last_session)));
                                 }
                             }
                         }
@@ -106,8 +113,9 @@ pub fn get_watch_sessions(data: &Value)-> Vec<WatchSession> {
                 }
             }
             if !last_session.is_empty() {
-                watch_list.push(WatchSession::new(std::mem::take(&mut last_session)));
+                watch_history_hash.insert(last_session[0],WatchSession::new(std::mem::take(&mut last_session)));
             }
         }
-        watch_list
+
+        watch_history_hash
 }
