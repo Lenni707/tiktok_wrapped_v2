@@ -78,7 +78,6 @@ impl Activity {
 }
 
 pub fn get_watch_sessions(data: &Value)-> HashMap<PrimitiveDateTime, WatchSession> { 
-        let watch_list: Vec<WatchSession> = Vec::new();
         let mut watch_history_hash: HashMap<PrimitiveDateTime, WatchSession> = HashMap::new();
         let mut last_session: Vec<PrimitiveDateTime> = Vec::new();
 
