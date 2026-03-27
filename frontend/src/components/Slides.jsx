@@ -192,7 +192,7 @@ export function LongestSessionSlide({ user }) {
           {sessionDate && <><strong>{sessionDate}</strong> · </>}
           <strong>{vidsInSesh.toLocaleString()}</strong> videos watched
         </p>
-        <span className="stat-deco" aria-hidden>🔥</span>
+        <span className="stat-deco" aria-hidden>😨</span>
       </div>
     </div>
   );
@@ -299,9 +299,9 @@ export function AvgVideoSlide({ user }) {
   const avgSecs = user.activity.average_time_per_vid;
 
   const personality =
-    avgSecs < 8  ? ["You skim at lightning speed.", "⚡"]  :
-    avgSecs < 15  ? ["You move fast. No time to waste.", "🎯"] :
-    avgSecs < 25  ? ["You're a selective scroller.", "👀"]  :
+    avgSecs < 10  ? ["Your cooked, get a life", "🫩"]  :
+    avgSecs < 15  ? ["You skim at lightning speed.", "⚡"] :
+    avgSecs < 20  ? ["You're a selective scroller.", "👀"]  :
                     ["You deep-dive into every video.", "🕳️"];
 
   return (
