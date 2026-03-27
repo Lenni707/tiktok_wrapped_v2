@@ -56,6 +56,7 @@ function App() {
               startCounting
             />
           </p>
+          <p>Your weekday with the highest average is {user.activity.avergae_time_per_weekday.highest_day}, with an avg of {(user.activity.avergae_time_per_weekday.highest_value / 60 / 60).toFixed(2)} hours watched</p>
         </div>
       )}
     </div>

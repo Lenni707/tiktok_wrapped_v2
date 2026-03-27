@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 
 use serde_json::Value;
-use time::{Date, Duration, PrimitiveDateTime};
+use time::{Date, Duration, PrimitiveDateTime, Weekday};
 use time::macros::{date, time};
 
 use crate::helper_func::string_to_time;
@@ -16,7 +16,8 @@ pub struct Activity {
     pub vids_watched: usize,
     pub average_time_per_vid: f32,
     pub most_watch_sessions_per_day: (Date, usize),
-    pub most_time_spend_on_tiktok_day: (Date, Duration)
+    pub most_time_spend_on_tiktok_day: (Date, Duration),
+    pub avergae_time_per_weekday: WeekdaysAvgTimeOnTT,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -37,6 +38,71 @@ impl WatchSession {
         let average_time_per_vid = duration.as_seconds_f32() / vids_watched as f32;
 
         WatchSession { duration, start, end, vids_watched, average_time_per_vid }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct WeekdaysAvgTimeOnTT {
+    pub monday: u32,
+    pub tuesday: u32,
+    pub wednesday: u32,
+    pub thursday: u32,
+    pub friday: u32,
+    pub saturday: u32,
+    pub sunday: u32,
+
+    pub highest_day: String,
+    pub highest_value: u32,
+}
+
+impl WeekdaysAvgTimeOnTT {
+    pub fn new_average_per_weekday( // extreme scheiße, weil das ganze keine hashmap sein kein sondern ein struct sein muss, weil das frontend (js) es sont nicht lesen kann. ich könnte natürlich auch eine funktion machen aber dann müsste ich die exposen und so, kb. Idee von mir, die Ausführung von chatty
+        map: HashMap<Weekday, (Duration, u32)>
+    ) -> Self {
+
+        let mut result = Self {
+            monday: 0,
+            tuesday: 0,
+            wednesday: 0,
+            thursday: 0,
+            friday: 0,
+            saturday: 0,
+            sunday: 0,
+            highest_day: String::new(),
+            highest_value: 0,
+        };
+
+        let mut highest_day = Weekday::Monday;
+        let mut highest_value: u32 = 0;
+
+        for (weekday, (duration, count)) in map {
+            let avg = if count == 0 {
+                0
+            } else {
+                (duration.as_seconds_f32() / count as f32) as u32
+            };
+
+            // assign to struct
+            match weekday {
+                Weekday::Monday => result.monday = avg,
+                Weekday::Tuesday => result.tuesday = avg,
+                Weekday::Wednesday => result.wednesday = avg,
+                Weekday::Thursday => result.thursday = avg,
+                Weekday::Friday => result.friday = avg,
+                Weekday::Saturday => result.saturday = avg,
+                Weekday::Sunday => result.sunday = avg,
+            }
+
+            if avg > highest_value {
+                highest_value = avg;
+                highest_day = weekday;
+            }
+        }
+
+        result.highest_day = format!("{:?}", highest_day); // tuffes ding dieses format macht aus jeglichen sachen iwie eine string
+        result.highest_value = highest_value;
+
+        result
     }
 }
 
@@ -85,20 +151,33 @@ impl Activity {
         let mut most_watch_sessions_per_day: (Date, usize) = (date!(2026-01-01), 0); // davor dummy value // rest selbst erklärend
         let mut most_time_spend_on_tiktok_day: (Date, Duration) = (date!(2026-01-01), Duration::new(1, 0));
 
-        for (date, watch_sessions) in watch_sessions_per_day_hashmap {
+        let mut watch_sessions_per_weekday_hashmap: HashMap<Weekday, (Duration, u32)> = HashMap::new();
+
+        for (date, watch_sessions) in watch_sessions_per_day_hashmap { // loop through all the dates to get all watchsession for specific date
 
             let mut time_spend_on_tiktok_that_day = Duration::new(0, 0);
-            for session in &watch_sessions {
+            for session in &watch_sessions { // loop through all sessionsin a day
                 time_spend_on_tiktok_that_day += session.duration;
             }
+
             if time_spend_on_tiktok_that_day > most_time_spend_on_tiktok_day.1 {
                 most_time_spend_on_tiktok_day = (date, time_spend_on_tiktok_that_day);
             }
-
             if watch_sessions.len() > most_watch_sessions_per_day.1 {
                 most_watch_sessions_per_day = (date, watch_sessions.len())
             }
+
+
+            if watch_sessions_per_weekday_hashmap.get(&date.weekday()).is_none() { // sort dates into weekdays with corresponding durration of tiktok watched that day
+                watch_sessions_per_weekday_hashmap.insert(date.weekday(), (time_spend_on_tiktok_that_day, 0));
+            } else {
+                if let Some(watch_session_per_specific_weekday) = watch_sessions_per_weekday_hashmap.get_mut(&date.weekday()) {
+                    watch_session_per_specific_weekday.0 += time_spend_on_tiktok_that_day;
+                    watch_session_per_specific_weekday.1 += 1;
+                }
+            }
         }
+
 
         Activity {
             watch_sessions_overall: watch_sessions,
@@ -108,12 +187,13 @@ impl Activity {
             vids_watched,
             average_time_per_vid: added_avg_of_time_per_vide_per_watch_session / num_watch_sessions_one_year as f32,
             most_watch_sessions_per_day,
-            most_time_spend_on_tiktok_day
+            most_time_spend_on_tiktok_day,
+            avergae_time_per_weekday: WeekdaysAvgTimeOnTT::new_average_per_weekday(watch_sessions_per_weekday_hashmap)
         }
     }
 }
 
-pub fn get_watch_sessions(data: &Value)-> HashMap<PrimitiveDateTime, WatchSession> { 
+pub fn get_watch_sessions(data: &Value) -> HashMap<PrimitiveDateTime, WatchSession> { 
         let mut watch_history_hash: HashMap<PrimitiveDateTime, WatchSession> = HashMap::new();
         let mut last_session: Vec<PrimitiveDateTime> = Vec::new();
 
