@@ -1,5 +1,8 @@
 use serde_json::Value;
 
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct Profile {
     pub name: String,
     pub follower_count: u32,

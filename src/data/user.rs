@@ -1,10 +1,13 @@
 use serde_json::Value;
+use serde::{Serialize, Deserialize};
 
 use crate::data::profile::Profile;
 use crate::data::likes::Likes;
 use crate::data::activity::Activity;
 use crate::data::comments::Comments;
 
+
+#[derive(Serialize, Deserialize)]
 pub struct User {
     pub profile: Profile,
     // likes: Likes,

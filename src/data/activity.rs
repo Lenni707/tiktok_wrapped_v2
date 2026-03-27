@@ -1,4 +1,4 @@
-use std::default;
+use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 
 use serde_json::Value;
@@ -7,6 +7,7 @@ use time::macros::{date, time};
 
 use crate::helper_func::string_to_time;
 
+#[derive(Serialize, Deserialize)]
 pub struct Activity {
     pub watch_sessions_overall: HashMap<PrimitiveDateTime, WatchSession>,
     pub num_watch_sessions_one_year: usize,
@@ -18,7 +19,7 @@ pub struct Activity {
     pub most_time_spend_on_tiktok_day: (Date, Duration)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WatchSession {
     pub duration: Duration,
     pub start: PrimitiveDateTime, // for on which day u watched tiktok the most
