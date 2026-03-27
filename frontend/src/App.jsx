@@ -1,66 +1,88 @@
 import { useState } from "react";
 import { parse_data } from "tiktok_wrapped_v2";
-import CountUp from './utils/CountUp';
+import Slideshow from "./components/Slideshow";
+import "./App.css";
 
-function App() {
-  const [user, setUser] = useState(null);
+export default function App() {
+  const [user, setUser]       = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState(null);
+  const [dragOver, setDragOver] = useState(false);
 
-  const handleFile = async (event) => {
-    const file = event.target.files[0];
+  const processFile = async (file) => {
     if (!file) return;
-
-    const text = await file.text();   // JS reads file
-    const result = parse_data(text);  // Rust parses JSON
-
-    setUser(result);
+    if (!file.name.endsWith(".json")) {
+      setError("That doesn't look like a JSON file. Try again.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const text   = await file.text();
+      const result = parse_data(text);
+      setUser(result);
+    } catch (e) {
+      console.error(e);
+      setError("Couldn't parse your file. Make sure it's your TikTok data export JSON.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleFile = (e)  => processFile(e.target.files[0]);
+  const handleDrop = (e)  => {
+    e.preventDefault();
+    setDragOver(false);
+    processFile(e.dataTransfer.files[0]);
+  };
+
+  if (user) return <Slideshow user={user} onReset={() => setUser(null)} />;
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Upload TikTok JSON 👇</h1>
+    <div
+      className={`upload-screen ${dragOver ? "drag-over" : ""}`}
+      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={handleDrop}
+    >
+      {/* Ambient blobs */}
+      <div className="upload-blobs" aria-hidden>
+        <div className="ublob ublob-pink" />
+        <div className="ublob ublob-cyan" />
+        <div className="ublob ublob-pink2" />
+      </div>
 
-      <input type="file" onChange={handleFile} />
-
-      {user && (
-        <div style={{ marginTop: "20px" }}>
-          <h2>Results:</h2>
-
-          <img
-            src={user.profile.pfp}
-            alt="example"
-            style={{ width: "100px" }}
-          />
-          <p>Hello {user.profile?.name}!</p>
-          <p>
-            Watch Time:{" "}
-            <CountUp
-              from={0}
-              to={parseInt(user.activity?.watch_time_secs / 60.0 / 60.0 / 24.0)}
-              separator=","
-              direction="up"
-              duration={0.25}
-              className="count-up-text"
-              startCounting
-            />
-            {" "}Days
-          </p>
-          <p>
-            Videos watched:{" "}
-            <CountUp
-              from={0}
-              to={user.activity.vids_watched}
-              separator=","
-              direction="up"
-              duration={0.25}
-              className="count-up-text"
-              startCounting
-            />
-          </p>
-          <p>Your weekday with the highest average is {user.activity.avergae_time_per_weekday.highest_day}, with an avg of {(user.activity.avergae_time_per_weekday.highest_value / 60 / 60).toFixed(2)} hours watched</p>
+      <div className="upload-inner">
+        {/* TikTok 3-layer glitch logo */}
+        <div className="tt-logo" aria-hidden>
+          <span className="ttl-cyan">TT</span>
+          <span className="ttl-pink">TT</span>
+          <span className="ttl-main">TT</span>
         </div>
-      )}
+
+        <h1 className="upload-title">
+          TikTok<br />Wrapped
+        </h1>
+
+        <p className="upload-sub">
+          {dragOver
+            ? "Drop it! 🎯"
+            : "Your year in scroll. Upload your TikTok data export to begin."}
+        </p>
+
+        <label className="upload-btn">
+          <input type="file" accept=".json" onChange={handleFile} hidden />
+          {loading
+            ? <span className="loading-dots">Parsing<span>.</span><span>.</span><span>.</span></span>
+            : "Choose File"}
+        </label>
+
+        {error && <p className="upload-error">{error}</p>}
+
+        <p className="upload-hint">
+          TikTok → Settings → Privacy → Download Your Data → Request JSON format
+        </p>
+      </div>
     </div>
   );
 }
-
-export default App;

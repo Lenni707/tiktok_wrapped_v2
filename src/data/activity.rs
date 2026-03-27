@@ -23,6 +23,7 @@ pub struct Activity {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WatchSession {
     pub duration: Duration,
+    pub duration_as_secs: f32,
     pub start: PrimitiveDateTime, // for on which day u watched tiktok the most
     pub end: PrimitiveDateTime, // for coolness when debuggin
     pub vids_watched: usize,
@@ -37,7 +38,7 @@ impl WatchSession {
         let vids_watched = session.len();
         let average_time_per_vid = duration.as_seconds_f32() / vids_watched as f32;
 
-        WatchSession { duration, start, end, vids_watched, average_time_per_vid }
+        WatchSession { duration, duration_as_secs: duration.as_seconds_f32(), start, end, vids_watched, average_time_per_vid }
     }
 }
 
@@ -112,7 +113,7 @@ impl Activity {
 
         let mut watch_time: Duration = Duration::new(0, 0);
         let mut vids_watched: usize = 0;
-        let mut longest_watch: WatchSession = WatchSession { duration: Duration::default(), start: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), end: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), vids_watched: 0, average_time_per_vid: 0.}; // so dumm
+        let mut longest_watch: WatchSession = WatchSession { duration: Duration::default(), duration_as_secs: 0., start: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), end: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), vids_watched: 0, average_time_per_vid: 0.}; // so dumm
         let mut num_watch_sessions_one_year: usize = 0;
 
         let mut watch_sessions_per_day_hashmap: HashMap<Date, Vec<&WatchSession>> = HashMap::new();
