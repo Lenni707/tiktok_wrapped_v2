@@ -5,19 +5,81 @@ use serde_json::Value;
 use time::{Date, Duration, PrimitiveDateTime, Weekday};
 use time::macros::{date, time};
 
-use crate::helper_func::string_to_time;
+use crate::helper_func::{string_to_time, date_to_nice_date};
 
 #[derive(Serialize, Deserialize)]
 pub struct Activity {
     pub watch_sessions_overall: HashMap<PrimitiveDateTime, WatchSession>,
     pub num_watch_sessions_one_year: usize,
-    pub longest_watch_session: WatchSession,
+    pub longest_watch_session: BetterFormattedWatchSession,
     pub watch_time_secs: f32,
     pub vids_watched: usize,
     pub average_time_per_vid: f32,
-    pub most_watch_sessions_per_day: (Date, usize),
-    pub most_time_spend_on_tiktok_day: (Date, Duration),
+    pub most_watch_sessions_per_day: MostWatchSessionsPerDay,
+    pub most_time_spend_on_tiktok_day: TimeSpendOnTiktokDay,
     pub avergae_time_per_weekday: WeekdaysAvgTimeOnTT,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct BetterFormattedWatchSession {
+    pub date_as_string: String,
+    pub duration_as_secs: f32,
+    pub session: WatchSession
+}
+
+impl BetterFormattedWatchSession {
+    fn new(session: WatchSession) -> Self {
+        let date_as_string = date_to_nice_date(session.start.date());
+        let duration_as_secs = session.duration.as_seconds_f32();
+
+        BetterFormattedWatchSession { 
+            date_as_string, 
+            duration_as_secs, 
+            session 
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MostWatchSessionsPerDay {
+    pub date: Date,
+    pub date_as_string: String,
+    pub count: usize,
+}
+
+impl MostWatchSessionsPerDay {
+    fn new(date: Date, count: usize) -> Self {
+        let date_as_string = date_to_nice_date(date);
+
+        MostWatchSessionsPerDay { 
+            date, 
+            date_as_string, 
+            count 
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TimeSpendOnTiktokDay { // helper struct
+    pub date: Date,
+    pub date_as_string: String,
+    pub duration: Duration,
+    pub duration_as_secs: f32
+}
+
+impl TimeSpendOnTiktokDay {
+    fn new(date: Date, duration: Duration) -> Self {
+        let date_as_string = date_to_nice_date(date);
+
+        let duration_as_secs = duration.as_seconds_f32();
+
+        TimeSpendOnTiktokDay {
+            date,
+            date_as_string,
+            duration,
+            duration_as_secs,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -113,7 +175,7 @@ impl Activity {
 
         let mut watch_time: Duration = Duration::new(0, 0);
         let mut vids_watched: usize = 0;
-        let mut longest_watch: WatchSession = WatchSession { duration: Duration::default(), duration_as_secs: 0., start: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), end: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), vids_watched: 0, average_time_per_vid: 0.}; // so dumm
+        let mut longest_watch: BetterFormattedWatchSession = BetterFormattedWatchSession::new(WatchSession { duration: Duration::default(), duration_as_secs: 0., start: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), end: PrimitiveDateTime::new(date!(2067-01-01), time!(0:00)), vids_watched: 0, average_time_per_vid: 0.}); // so dumm
         let mut num_watch_sessions_one_year: usize = 0;
 
         let mut watch_sessions_per_day_hashmap: HashMap<Date, Vec<&WatchSession>> = HashMap::new();
@@ -144,13 +206,13 @@ impl Activity {
             watch_time += watch_session.duration;
             vids_watched += watch_session.vids_watched;
             added_avg_of_time_per_vide_per_watch_session += watch_session.average_time_per_vid;
-            if watch_session.duration > longest_watch.duration {
-                longest_watch = watch_session.clone(); // weil ich ein fauler sack bin
+            if watch_session.duration > longest_watch.session.duration {
+                longest_watch = BetterFormattedWatchSession::new(watch_session.clone()); // weil ich ein fauler sack bin
             }
         }
 
-        let mut most_watch_sessions_per_day: (Date, usize) = (date!(2026-01-01), 0); // davor dummy value // rest selbst erklärend
-        let mut most_time_spend_on_tiktok_day: (Date, Duration) = (date!(2026-01-01), Duration::new(1, 0));
+        let mut most_watch_sessions_per_day: MostWatchSessionsPerDay  = MostWatchSessionsPerDay::new(date!(2026-01-01), 0); // davor dummy value // rest selbst erklärend
+        let mut most_time_spend_on_tiktok_day: TimeSpendOnTiktokDay = TimeSpendOnTiktokDay::new(date!(2026-01-01), Duration::new(0, 0));
 
         let mut watch_sessions_per_weekday_hashmap: HashMap<Weekday, (Duration, u32)> = HashMap::new();
 
@@ -161,11 +223,11 @@ impl Activity {
                 time_spend_on_tiktok_that_day += session.duration;
             }
 
-            if time_spend_on_tiktok_that_day > most_time_spend_on_tiktok_day.1 {
-                most_time_spend_on_tiktok_day = (date, time_spend_on_tiktok_that_day);
+            if time_spend_on_tiktok_that_day > most_time_spend_on_tiktok_day.duration {
+                most_time_spend_on_tiktok_day = TimeSpendOnTiktokDay::new(date, time_spend_on_tiktok_that_day);
             }
-            if watch_sessions.len() > most_watch_sessions_per_day.1 {
-                most_watch_sessions_per_day = (date, watch_sessions.len())
+            if watch_sessions.len() > most_watch_sessions_per_day.count {
+                most_watch_sessions_per_day = MostWatchSessionsPerDay::new(date, watch_sessions.len())
             }
 
 

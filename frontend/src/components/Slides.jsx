@@ -18,20 +18,20 @@ import CountUp from "./CountUp";
 //   return 0;
 // }
 
-/**
- * Format a date string (YYYY-MM-DD or ISO datetime) into "March 15" etc.
- */
-function fmtDate(raw) {
-  if (!raw) return "Unknown";
-  try {
-    // Strip time portion if present so Date doesn't apply UTC offset weirdness
-    const dateOnly = String(raw).split("T")[0];
-    const d = new Date(dateOnly + "T12:00:00");
-    return d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
-  } catch {
-    return String(raw);
-  }
-}
+// /**
+//  * Format a date string (YYYY-MM-DD or ISO datetime) into "March 15" etc.
+//  */
+// function fmtDate(raw) {
+//   if (!raw) return "Unknown";
+//   try {
+//     // Strip time portion if present so Date doesn't apply UTC offset weirdness
+//     const dateOnly = String(raw).split("T")[0];
+//     const d = new Date(dateOnly + "T12:00:00");
+//     return d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+//   } catch {
+//     return String(raw);
+//   }
+// }
 
 /**
  * Small hook: triggers `started = true` after `delay` ms.
@@ -173,8 +173,8 @@ export function LongestSessionSlide({ user }) {
   const session   = user.activity.longest_watch_session;
   const durSecs   = session?.duration_as_secs;
   const durHours  = durSecs / 3600;
-  const vidsInSesh = session?.vids_watched ?? 0;
-  const sessionDate = session?.start ? fmtDate(String(session.start).split("T")[0]) : null;
+  const vidsInSesh = session?.session.vids_watched ?? 0;
+  const sessionDate = session?.date_as_string;
 
   return (
     <div className="slide slide-binge">
@@ -202,11 +202,11 @@ export function LongestSessionSlide({ user }) {
 export function BestDaySlide({ user }) {
   const started = useStarted(300);
 
-  // most_watch_sessions_per_day: (Date, usize) → ["2024-03-15", 23]
-  const [sessionDate, sessionCount] = user.activity.most_watch_sessions_per_day ?? ["??", 0];
+  const sessionDate = user.activity.most_watch_sessions_per_day.date_as_string ?? ["??"];
+  const sessionCount = user.activity.most_watch_sessions_per_day.count ?? [0];
 
-  // most_time_spend_on_tiktok_day: (Date, Duration) → ["2024-03-15", {seconds, nanoseconds}]
-  const [timeDate, timeDur] = user.activity.most_time_spend_on_tiktok_day ?? ["??", 0];
+  const timeDate = user.activity.most_time_spend_on_tiktok_day.date_as_string ?? ["?"];
+  const timeDur = user.activity.most_time_spend_on_tiktok_day.duration_as_secs ?? [0.0];
   const timeHours = timeDur / 3600;
 
   return (
@@ -214,7 +214,7 @@ export function BestDaySlide({ user }) {
       <div className="slide-noise" aria-hidden />
       <div className="stat-layout">
         <p className="stat-eyebrow">Your most active day was</p>
-        <div className="bestday-date">{fmtDate(sessionDate)}</div>
+        <div className="bestday-date">{sessionDate}</div>
         <div className="bestday-split">
           <div className="bs-item">
             <span className="bs-num">
@@ -334,7 +334,7 @@ export function SummarySlide({ user }) {
       label: "Days on TikTok",
       value: (activity.watch_time_secs / 86400).toFixed(1),
       suffix: "d",
-      color: "#c770ff",
+      color: "#ac47ea",
     },
     {
       label: "Videos watched",
@@ -353,7 +353,13 @@ export function SummarySlide({ user }) {
       color: "#FF004F",
     },
     {
-      label: "Avg per video",
+      label: "Most active day",
+      value: (activity.most_time_spend_on_tiktok_day.duration_as_secs / 3600).toFixed(1),
+      suffix: "h",
+      color: "#0011ff",
+    },
+    {
+      label: "Avg. per video",
       value: activity.average_time_per_vid.toFixed(1),
       suffix: "s",
       color: "#ffd166",
@@ -362,6 +368,18 @@ export function SummarySlide({ user }) {
       label: "Best weekday",
       value: wk.highest_day,
       color: "#06d6a0",
+    },
+    {
+      label: "Avg. Session length",
+      value: ((activity.watch_time_secs / activity.num_watch_sessions_one_year) / 60).toFixed(0),
+      suffix: "min",
+      color: "#64a2e4",
+    },
+    {
+      label: "Avg. daily watchtime",
+      value: (((activity.watch_time_secs / 60. / 60. / 24.) / 365.)* 24.).toFixed(1),
+      suffix: "h",
+      color: "#ea02f6",
     },
   ];
 
