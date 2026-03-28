@@ -8,7 +8,7 @@ use crate::data::comments::Comments;
 pub struct User {
     pub profile: Profile,
     // likes: Likes,
-    comments: Comments,
+    pub comments: Comments,
     pub activity: Activity
 }
 

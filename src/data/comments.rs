@@ -3,18 +3,19 @@ use std::collections::HashMap;
 use serde_json::Value;
 use time::{Date, Duration, PrimitiveDateTime};
 use time::macros::{date, time};
+use time::OffsetDateTime;
 
 
 use crate::helper_func::string_to_time;
 
 pub struct Comments {
-    num_of_comments: usize,
-    all_comments: HashMap<PrimitiveDateTime, Comment>
+    pub num_of_comments: usize,
+    pub all_comments: HashMap<PrimitiveDateTime, Comment> // Das sind aktuell nur die Comments des letzen Jahres, kann geändert werden
 }
-
-struct Comment {
-    date: PrimitiveDateTime,
-    message: String,
+#[derive(Clone)]
+pub struct Comment {
+    pub date: PrimitiveDateTime,
+    pub message: String,
 }
 // The format, idk what urs is...
 // "date": "2025-09-28 15:22:14",
@@ -24,14 +25,32 @@ struct Comment {
 // "url": ""
 
 impl Comments {
-    pub fn new(data: &Value)  {
+    pub fn new(data: &Value) -> Self {
+        let comments = get_comments(data);
 
+        let recent_comments = get_last_year(&comments);
+
+        let num_of_comments = recent_comments.len();
+
+        Self {
+            num_of_comments: num_of_comments,
+            all_comments: recent_comments,
+        }
     }
+}
+fn get_last_year(comments: &HashMap<PrimitiveDateTime, Comment>) -> HashMap<PrimitiveDateTime, Comment> {
+    let one_year_ago = OffsetDateTime::now_utc() - Duration::days(365);
+    let cutoff = PrimitiveDateTime::new(one_year_ago.date(), time!(00:00:00));
+
+    comments
+        .iter()
+        .filter(|(date, _)| **date >= cutoff)
+        .map(|(date, comment)| (*date, comment.clone()))
+        .collect()
 }
 
 fn get_comments(data: &Value) -> HashMap<PrimitiveDateTime, Comment> {
     let mut comments: HashMap<PrimitiveDateTime, Comment> = HashMap::new();
-    let mut last_comment: Vec<PrimitiveDateTime> = Vec::new();
 
     let all_comments = data
         .get("Comment")
@@ -48,10 +67,11 @@ fn get_comments(data: &Value) -> HashMap<PrimitiveDateTime, Comment> {
                 let date = string_to_time(curr);
 
                 if let Some(message) = item.get("comment").and_then(|v| v.as_str()) {
-                    let new_Comment = Comment {
+                    let new_comment = Comment {
                         date: date,
                         message: message.to_string()
                     };
+                    comments.insert(date, new_comment);
                 }
             }
         }
@@ -59,3 +79,4 @@ fn get_comments(data: &Value) -> HashMap<PrimitiveDateTime, Comment> {
     }
     comments
 }
+

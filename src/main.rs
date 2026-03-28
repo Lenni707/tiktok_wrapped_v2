@@ -10,7 +10,7 @@ use data::user::User;
 mod helper_func;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let file = File::open("../user_data_tiktok.json")?;
+    let file = File::open("./user_data_tiktok_t.json")?;
     // iwie schneller oder
     let reader = BufReader::new(file);
 
@@ -20,9 +20,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // taunt(user);
 
-    println!("{:?} {}", user.activity.most_time_spend_on_tiktok_day.0, user.activity.most_time_spend_on_tiktok_day.1.as_seconds_f32() / 60. / 60.);
-
-    println!("{:?}", user.activity.most_watch_sessions_per_day);
+    // println!("{:?} {}", user.activity.most_time_spend_on_tiktok_day.0, user.activity.most_time_spend_on_tiktok_day.1.as_seconds_f32() / 60. / 60.);
+    println!("{}", user.comments.num_of_comments);
+    // println!("{:?}", user.activity.most_watch_sessions_per_day);
 
     // println!("{:?}", &data["Your Activity"]["Watch History"]["VideoList"][1]); // for later expansion of data that gets processed
 
