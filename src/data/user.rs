@@ -8,7 +8,7 @@ use crate::data::comments::Comments;
 pub struct User {
     pub profile: Profile,
     // likes: Likes,
-    // comments: Comments,
+    comments: Comments,
     pub activity: Activity
 }
 
@@ -16,7 +16,8 @@ impl User {
     pub fn new(data: &Value) -> Self {
         User {
             profile: Profile::new(data),
-            activity: Activity::new(data)
+            activity: Activity::new(data),
+            comments: Comments::new(data),
         }
     }
 }
