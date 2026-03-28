@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 use serde_json::Value;
 use time::PrimitiveDateTime;
 
-use crate::{data, helper_func::string_to_time};
+use crate::helper_func::{string_to_time, date_to_nice_date};
 
 #[derive(Serialize, Deserialize)]
 pub struct Likes {
@@ -14,6 +14,7 @@ pub struct Likes {
 #[derive(Serialize, Deserialize)]
 pub struct Video {
     pub date: PrimitiveDateTime,
+    pub date_as_string: String,
     pub link: String,
 }
 
@@ -43,6 +44,7 @@ fn get_liked_videos(data: &Value) -> HashMap<PrimitiveDateTime, Video> {
                 if let Some(link) = vid.get("link").and_then(|v| v.as_str()) {
                     let new_liked = Video {
                         date: curr_date,
+                        date_as_string: date_to_nice_date(curr_date.date()),
                         link: link.to_string()
                     };
                     // Das ist irgendwie goofy, aber ig wir können nach dem Datum indexen

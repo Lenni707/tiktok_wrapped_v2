@@ -85,7 +85,7 @@ export default function App() {
           TikTok → Settings → Privacy → Download Your Data → Request JSON format
         </p>
 
-        <div style={{ marginTop: "150px" }}>
+        <div style={{ marginTop: "150px" }}> {/* für später: content von dem faq in FAQ.jsx ändern */}
           <FAQ />
         </div>
       </div>

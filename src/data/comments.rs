@@ -7,7 +7,7 @@ use time::macros::{date, time};
 use time::OffsetDateTime;
 
 
-use crate::helper_func::string_to_time;
+use crate::helper_func::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct Comments {
@@ -17,6 +17,7 @@ pub struct Comments {
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Comment {
     pub date: PrimitiveDateTime,
+    pub date_as_string: String,
     pub message: String,
 }
 // The format, idk what urs is...
@@ -35,18 +36,18 @@ impl Comments {
         let num_of_comments = recent_comments.len();
 
         Self {
-            num_of_comments: num_of_comments,
+            num_of_comments,
             all_comments: recent_comments,
         }
     }
 }
 
 fn get_last_year(comments: &HashMap<PrimitiveDateTime, Comment>) -> HashMap<PrimitiveDateTime, Comment> {
-    // Das ist doch cooler so oder?
+    // Das ist doch cooler so oder? ja aber nur für comments, bei videos macht das andere mehr sinn und maybe geht das mit wasm nicht so gut
     let one_year_ago = OffsetDateTime::now_utc() - Duration::days(365);
     let cutoff = PrimitiveDateTime::new(one_year_ago.date(), time!(00:00:00));
 
-    comments
+    comments // holy vibe code aber macht sinn
         .iter()
         .filter(|(date, _)| **date >= cutoff)
         .map(|(date, comment)| (*date, comment.clone()))
@@ -73,7 +74,8 @@ fn get_comments(data: &Value) -> HashMap<PrimitiveDateTime, Comment> {
                 if let Some(message) = item.get("comment").and_then(|v| v.as_str()) {
                     let new_comment = Comment {
                         date: date,
-                        message: message.to_string()
+                        date_as_string: date_to_nice_date(date.date()),
+                        message: message.to_string(),
                     };
                     comments.insert(date, new_comment);
                 }
