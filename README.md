@@ -101,4 +101,8 @@ Rust (Wasm) parses JSON
 Returns structured data
         ↓
 React renders UI
+
+```
+
+## LICENSED under MIT
 ```
