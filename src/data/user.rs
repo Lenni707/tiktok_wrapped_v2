@@ -10,8 +10,8 @@ use crate::data::comments::Comments;
 #[derive(Serialize, Deserialize)]
 pub struct User {
     pub profile: Profile,
-    // likes: Likes,
-    // comments: Comments,
+    pub likes: Likes,
+    pub comments: Comments,
     pub activity: Activity
 }
 
@@ -19,7 +19,9 @@ impl User {
     pub fn new(data: &Value) -> Self {
         User {
             profile: Profile::new(data),
-            activity: Activity::new(data)
+            likes: Likes::new(data),
+            comments: Comments::new(data),
+            activity: Activity::new(data),
         }
     }
 }
