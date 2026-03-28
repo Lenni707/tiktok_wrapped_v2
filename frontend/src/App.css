@@ -13,28 +13,45 @@
 }
 
 html, body, #root {
-  width: 100%; height: 100%;
-  overflow: hidden;
-  background: var(--black);
+  width: 100%;
+  min-height: 100%;
+  background: #050505;
   font-family: var(--font-body);
   color: var(--white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 /* ── Upload Screen ────────────────────────────────────────────────────────── */
 .upload-screen {
-  width: 100vw; height: 100vh;
-  display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
-  background: #050505;
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;  /* ← was center */
+  padding-top: 80px;            /* ← add this for top breathing room */
+  position: relative;
+  overflow: visible;
+  background: transparent;
   transition: background 0.4s ease;
 }
 .upload-screen.drag-over { background: #0d0020; }
 
+.upload-screen > * {
+  width: 100%;
+}
+
 /* Ambient blobs */
 .upload-blobs {
-  position: absolute; inset: 0; pointer-events: none;
+  position: fixed;          /* ← was absolute, now stays in bg while scrolling */
+  inset: 0;
+  pointer-events: none;
 }
 .ublob {
   position: absolute; border-radius: 50%;

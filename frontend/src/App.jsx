@@ -3,6 +3,8 @@ import { parse_data } from "tiktok_wrapped_v2";
 import Slideshow from "./components/Slideshow";
 import "./App.css";
 
+import FAQ from "./components/FAQ";
+
 export default function App() {
   const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(false);
@@ -82,6 +84,10 @@ export default function App() {
         <p className="upload-hint">
           TikTok → Settings → Privacy → Download Your Data → Request JSON format
         </p>
+
+        <div style={{ marginTop: "150px" }}>
+          <FAQ />
+        </div>
       </div>
     </div>
   );
