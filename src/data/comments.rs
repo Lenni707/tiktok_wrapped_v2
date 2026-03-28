@@ -38,7 +38,9 @@ impl Comments {
         }
     }
 }
+
 fn get_last_year(comments: &HashMap<PrimitiveDateTime, Comment>) -> HashMap<PrimitiveDateTime, Comment> {
+    // Das ist doch cooler so oder?
     let one_year_ago = OffsetDateTime::now_utc() - Duration::days(365);
     let cutoff = PrimitiveDateTime::new(one_year_ago.date(), time!(00:00:00));
 

@@ -21,10 +21,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // taunt(user);
 
     // println!("{:?} {}", user.activity.most_time_spend_on_tiktok_day.0, user.activity.most_time_spend_on_tiktok_day.1.as_seconds_f32() / 60. / 60.);
-    println!("{}", user.comments.num_of_comments);
+    println!("{}", user.likes.count_liked_vids);
     // println!("{:?}", user.activity.most_watch_sessions_per_day);
 
-    // println!("{:?}", &data["Your Activity"]["Watch History"]["VideoList"][1]); // for later expansion of data that gets processed
+    println!("{:?}", get_keys(&data["Likes and Favorites"]["Like List"])); // for later expansion of data that gets processed
 
     drop(data); // disposes of the data to safe memory. Maybe dumm aber ich kopiere für mein eigenes immer aus dem originalen raus
 
