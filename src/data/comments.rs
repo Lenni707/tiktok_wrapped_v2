@@ -43,9 +43,14 @@ impl Comments {
 }
 
 fn get_last_year(comments: &HashMap<PrimitiveDateTime, Comment>) -> HashMap<PrimitiveDateTime, Comment> {
-    // Das ist doch cooler so oder? ja aber nur für comments, bei videos macht das andere mehr sinn und maybe geht das mit wasm nicht so gut
-    let one_year_ago = OffsetDateTime::now_utc() - Duration::days(365);
-    let cutoff = PrimitiveDateTime::new(one_year_ago.date(), time!(00:00:00));
+    // Das ist doch cooler so oder? ja aber nur für comments, bei videos macht das andere mehr sinn und maybe geht das mit wasm nicht so gut GEHT NICHT FÜR WASM DESWEGEN SO
+    let cutoff = comments.values()
+            .map(|s| s.date)
+            .max()
+            .unwrap() - Duration::days(365);
+
+    // let one_year_ago = most_recent_date - Duration::days(365);
+    // let cutoff = PrimitiveDateTime::new(one_year_ago.date(), time!(00:00:00));
 
     comments // holy vibe code aber macht sinn
         .iter()
