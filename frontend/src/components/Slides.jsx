@@ -52,6 +52,7 @@ function useStarted(delay = 450) {
 export function WelcomeSlide({ user }) {
   const started = useStarted(150);
   const { profile } = user;
+  const pfpUrl = `/tiktok_pfp?url=${encodeURIComponent(user.pfp)}`
 
   return (
     <div className="slide slide-welcome">
@@ -61,9 +62,9 @@ export function WelcomeSlide({ user }) {
       </div>
 
       <div className={`welcome-content ${started ? "wc-show" : ""}`}>
-        {profile.pfp && (
+        {pfpUrl && (
           <div className="welcome-pfp-ring">
-            <img src={profile.pfp} alt={profile.name} className="welcome-pfp" />
+            <img src={pfpUrl} alt={profile.name} className="welcome-pfp" />
           </div>
         )}
         <p className="welcome-eyebrow">@{profile.name}</p>
@@ -414,6 +415,7 @@ export function SummarySlide({ user }) {
   const started = useStarted(200);
   const { profile, activity, likes, comments, shares } = user;
   const wk = activity.avergae_time_per_weekday;
+  const pfpUrl = `/tiktok_pfp?url=${encodeURIComponent(profile.pfp)}`
 
 const cards = [
   {
@@ -496,9 +498,9 @@ const cards = [
       </div>
 
       <div className="summary-layout">
-        {profile.pfp && (
+        {pfpUrl && (
           <div className="summary-pfp-ring">
-            <img src={profile.pfp} alt={profile.name} className="summary-pfp" />
+            <img src={pfpUrl} alt={profile.name} className="summary-pfp" />
           </div>
         )}
         <h2 className="summary-name">@{profile.name}</h2>
