@@ -52,7 +52,7 @@ function useStarted(delay = 450) {
 export function WelcomeSlide({ user }) {
   const started = useStarted(150);
   const { profile } = user;
-  const pfpUrl = `/tiktok_pfp?url=${profile.pfp}`
+  const pfpUrl = `/tiktok_pfp?url=${encodeURIComponent(profile.pfp)}`
 
   return (
     <div className="slide slide-welcome">
@@ -415,7 +415,7 @@ export function SummarySlide({ user }) {
   const started = useStarted(200);
   const { profile, activity, likes, comments, shares } = user;
   const wk = activity.avergae_time_per_weekday;
-  const pfpUrl = `/tiktok_pfp?url=${profile.pfp}`
+  const pfpUrl = `/tiktok_pfp?url=${encodeURIComponent(profile.pfp)}`
 
 const cards = [
   {
