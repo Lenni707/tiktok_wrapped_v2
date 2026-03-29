@@ -10,7 +10,7 @@ use data::user::User;
 mod helper_func;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let file = File::open("./user_data_tiktok_t.json")?;
+    let file = File::open("../user_data_tiktok.json")?;
     // iwie schneller oder
     let reader = BufReader::new(file);
 
@@ -21,10 +21,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // taunt(user);
 
     // println!("{:?} {}", user.activity.most_time_spend_on_tiktok_day.0, user.activity.most_time_spend_on_tiktok_day.1.as_seconds_f32() / 60. / 60.);
-    println!("{}", user.likes.count_liked_vids);
+    println!("{}", user.shares.count_shared_vids);
     // println!("{:?}", user.activity.most_watch_sessions_per_day);
 
-    println!("{:?}", get_keys(&data["Likes and Favorites"]["Like List"])); // for later expansion of data that gets processed
+    // println!("{:?}", get_keys(&data["Your Activity"]["Share History"]["ShareHistoryList"][0]));
+
+    // println!("{:?}", &data["Your Activity"]["Share History"]["ShareHistoryList"][0]);
 
     drop(data); // disposes of the data to safe memory. Maybe dumm aber ich kopiere für mein eigenes immer aus dem originalen raus
 

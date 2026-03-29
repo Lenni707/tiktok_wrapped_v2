@@ -1,2 +1,4 @@
 /target
 user_data_tiktok*.json
+/pkg
+/frontend

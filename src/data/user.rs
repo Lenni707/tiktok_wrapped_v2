@@ -4,12 +4,14 @@ use crate::data::profile::Profile;
 use crate::data::likes::Likes;
 use crate::data::activity::Activity;
 use crate::data::comments::Comments;
+use crate::data::shares::Shares;
 
 pub struct User {
     pub profile: Profile,
     pub likes: Likes,
     pub comments: Comments,
-    pub activity: Activity
+    pub activity: Activity,
+    pub shares: Shares,
 }
 
 impl User {
@@ -19,6 +21,7 @@ impl User {
             activity: Activity::new(data),
             comments: Comments::new(data),
             likes: Likes::new(data),
+            shares: Shares::new(data),
         }
     }
 }
