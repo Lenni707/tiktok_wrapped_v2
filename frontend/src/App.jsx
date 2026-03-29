@@ -100,7 +100,7 @@ export default function App() {
         {error && <p className="upload-error">{error}</p>}
 
         <p className="upload-hint">
-          TikTok → Settings → Privacy → Download Your Data → Request JSON format
+          TikTok → Settings → Account → Download your Data → Request JSON Format → Choose all boxes
         </p>
 
         <div style={{ marginTop: "150px" }}> {/* für später: content von dem faq in FAQ.jsx ändern */}

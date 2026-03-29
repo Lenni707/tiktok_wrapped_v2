@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 
 use serde_json::Value;
-use time::PrimitiveDateTime;
+use time::{Date, Duration, PrimitiveDateTime};
+
 
 use crate::{helper_func::string_to_time};
 
@@ -11,7 +12,7 @@ pub struct Shares{
     pub count_shared_vids: usize
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Video {
     pub date: PrimitiveDateTime,
     pub link: String,
@@ -20,8 +21,11 @@ pub struct Video {
 impl Shares {
     pub fn new(data: &Value) -> Self {
         let shared_vids = get_shared_videos(data);
+        
+        let recent_shares = get_last_year(&shared_vids);
+
         Self {
-            count_shared_vids: shared_vids.len()
+            count_shared_vids: recent_shares.len()
         }
     }
 }
@@ -52,4 +56,21 @@ fn get_shared_videos(data: &Value) -> HashMap<PrimitiveDateTime, Video> {
         }
     }
     liked_videos
+}
+
+fn get_last_year(liked: &HashMap<PrimitiveDateTime, Video>) -> HashMap<PrimitiveDateTime, Video> {
+    // Das ist doch cooler so oder? ja aber nur für comments, bei videos macht das andere mehr sinn und maybe geht das mit wasm nicht so gut GEHT NICHT FÜR WASM DESWEGEN SO
+    let cutoff = liked.values()
+            .map(|s| s.date)
+            .max()
+            .unwrap() - Duration::days(365);
+
+    // let one_year_ago = most_recent_date - Duration::days(365);
+    // let cutoff = PrimitiveDateTime::new(one_year_ago.date(), time!(00:00:00));
+
+    liked // holy vibe code aber macht sinn
+        .iter()
+        .filter(|(date, _)| **date >= cutoff)
+        .map(|(date, comment)| (*date, comment.clone()))
+        .collect()
 }
