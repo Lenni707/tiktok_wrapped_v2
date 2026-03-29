@@ -227,52 +227,47 @@
   50%       { opacity: 0.75; }
 }
 
-/* 2. Watch Time */
+/* 2. Watch Time — violet #7C3AED */
 .slide-watchtime {
-  background: radial-gradient(ellipse at 70% 20%, #5e0080 0%, #2a0040 40%, #12001a 100%);
+  background: radial-gradient(ellipse at 70% 20%, #4a1a9e 0%, #22004d 40%, #0e0020 100%);
 }
-
-/* 3. Videos */
+/* 3. Videos — cyan #06B6D4 */
 .slide-videos {
-  background: radial-gradient(ellipse at 30% 70%, #005a6e 0%, #002a38 40%, #000d14 100%);
+  background: radial-gradient(ellipse at 30% 70%, #016a80 0%, #003040 40%, #001018 100%);
 }
-
-/* 4. Sessions */
+/* 4. Sessions — orange #F97316 */
 .slide-sessions {
-  background: radial-gradient(ellipse at 60% 30%, #7a3000 0%, #3d1200 45%, #1a0500 100%);
+  background: radial-gradient(ellipse at 60% 30%, #8a3800 0%, #461800 45%, #1c0800 100%);
 }
-
-/* 5. Longest binge */
+/* 5. Longest binge — red #EF4444 */
 .slide-binge {
-  background: radial-gradient(ellipse at 40% 60%, #3a0090 0%, #1a0050 40%, #09001a 100%);
+  background: radial-gradient(ellipse at 40% 60%, #8a0000 0%, #440000 40%, #1a0000 100%);
 }
-
-/* 6. Best Day */
+/* 6. Best Day — blue #3B82F6 */
 .slide-bestday {
-  background: radial-gradient(ellipse at 50% 40%, #005a2a 0%, #002a12 45%, #000d05 100%);
+  background: radial-gradient(ellipse at 50% 40%, #003a9e 0%, #001a52 45%, #000820 100%);
 }
-
-/* 7. Weekday */
+/* 7. Weekday — emerald #10B981 */
 .slide-weekday {
-  background: radial-gradient(ellipse at 65% 25%, #800045 0%, #400020 40%, #18000d 100%);
+  background: radial-gradient(ellipse at 65% 25%, #006644 0%, #003322 40%, #001410 100%);
 }
-
-/* 8. Avg per video */
+/* 8. Avg per video — yellow #EAB308 */
 .slide-avg {
-  background: radial-gradient(ellipse at 35% 65%, #6a4800 0%, #382200 40%, #160d00 100%);
+  background: radial-gradient(ellipse at 35% 65%, #7a5a00 0%, #3d2a00 40%, #181000 100%);
 }
-
-/* 9. Comment Slide */
+/* 9. Comments — pink #F472B6 */
 .slide-comments {
-  background: radial-gradient(ellipse at 35% 65%, #13006a 0%, #040038 40%, #000116 100%);
+  background: radial-gradient(ellipse at 35% 65%, #7a1a50 0%, #3d0828 40%, #180010 100%);
 }
-
-/* 10. Comment Slide */
+/* 10. Likes — amber-orange #FB923C */
 .slide-likes {
-  background: radial-gradient(ellipse at 35% 65%, #6a0000 0%, #380006 40%, #160000 100%);
+  background: radial-gradient(ellipse at 35% 65%, #7a3200 0%, #3d1800 40%, #180800 100%);
 }
-
-/* 11. Summary */
+/* 11. Shares — mint #34D399 */
+.slide-shares {
+  background: radial-gradient(ellipse at 35% 65%, #006644 0%, #003322 40%, #001410 100%);
+}
+/* 12. Summary */
 .slide-summary {
   background: #050505;
 }

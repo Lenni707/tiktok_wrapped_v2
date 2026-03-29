@@ -381,10 +381,38 @@ export function LikeSlide({ user }) {
   );
 }
 
-/* 11. Summary --------------------------------------------------------------- */
+/* 11. Shares Slide --------------------------------------------------------------- */
+export function SharesSlide({ user }) {
+  const started = useStarted();
+  const numShares = user.shares.count_shared_vids;
+  const numWatchedVids = user.activity.vids_watched;
+  const freqShares = numWatchedVids / numShares;
+
+  return (
+    <div className="slide slide-shares">
+      <div className="slide-noise" aria-hidden />
+      <div className="stat-layout">
+        <p className="stat-eyebrow">Last year you shared</p>
+        <div className="stat-hero">
+          <span className="stat-number">
+            <CountUp from={0} to={numShares} duration={2.2} decimals={0} startCounting={started} />
+          </span>
+          <span className="stat-unit">videos</span>
+        </div>
+        <p className="stat-body">a like</p>
+        <p className="stat-subtext">
+          You only deemend every <strong><CountUp from={0} to={freqShares} duration={1.8} decimals={0} startCounting={started} />th</strong> worth sharing on avergae
+        </p>
+        <span className="stat-deco" aria-hidden>📲</span>
+      </div>
+    </div>
+  );
+}
+
+/* 12. Summary --------------------------------------------------------------- */
 export function SummarySlide({ user }) {
   const started = useStarted(200);
-  const { profile, activity, likes, comments } = user;
+  const { profile, activity, likes, comments, shares } = user;
   const wk = activity.avergae_time_per_weekday;
 
 const cards = [
@@ -453,7 +481,7 @@ const cards = [
   },
   {
     label: "Videos shared",
-    value: ("todo"),
+    value: (shares.count_shared_vids),
     suffix: "",
     color: "#34D399",
   },
@@ -512,5 +540,6 @@ export const slides = [
   AvgVideoSlide,
   CommentSlide,
   LikeSlide,
+  SharesSlide,
   SummarySlide,
 ];
