@@ -262,7 +262,17 @@
   background: radial-gradient(ellipse at 35% 65%, #6a4800 0%, #382200 40%, #160d00 100%);
 }
 
-/* 9. Summary */
+/* 9. Comment Slide */
+.slide-comments {
+  background: radial-gradient(ellipse at 35% 65%, #13006a 0%, #040038 40%, #000116 100%);
+}
+
+/* 10. Comment Slide */
+.slide-likes {
+  background: radial-gradient(ellipse at 35% 65%, #6a0000 0%, #380006 40%, #160000 100%);
+}
+
+/* 11. Summary */
 .slide-summary {
   background: #050505;
 }

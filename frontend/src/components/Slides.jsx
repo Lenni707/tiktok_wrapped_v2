@@ -323,65 +323,141 @@ export function AvgVideoSlide({ user }) {
   );
 }
 
-/* 9. Summary --------------------------------------------------------------- */
+/* 9. Comment Slide --------------------------------------------------------------- */
+export function CommentSlide({ user }) {
+  const started = useStarted();
+  const numComments = user.comments.num_of_comments;
+
+  const personality =
+    numComments < 70  ? ["Of the silent type I guess", "🤫"]  :
+    numComments < 130  ? ["Not much of a writer", "📩"] :
+    numComments < 200  ? ["You know how to express your opinion", "🗣️"]  :
+                    ["Do you even stop writing?", "🖊️"];
+
+  return (
+    <div className="slide slide-comments">
+      <div className="slide-noise" aria-hidden />
+      <div className="stat-layout">
+        <p className="stat-eyebrow">Last year you wrote</p>
+        <div className="stat-hero">
+          <span className="stat-number">
+            <CountUp from={0} to={numComments} duration={1.8} decimals={0} startCounting={started} />
+          </span>
+          <span className="stat-unit">comments</span>
+        </div>
+        <p className="stat-body">and expressed your opinion</p>
+        <p className="stat-subtext">{personality[0]}</p>
+        <span className="stat-deco" aria-hidden>{personality[1]}</span>
+      </div>
+    </div>
+  );
+}
+
+/* 10. Like Slide --------------------------------------------------------------- */
+export function LikeSlide({ user }) {
+  const started = useStarted();
+  const numLikes = user.likes.count_liked_vids;
+  const numWatchedVids = user.activity.vids_watched;
+  const freqLikes = numWatchedVids / numLikes;
+
+  return (
+    <div className="slide slide-likes">
+      <div className="slide-noise" aria-hidden />
+      <div className="stat-layout">
+        <p className="stat-eyebrow">Last year you gave</p>
+        <div className="stat-hero">
+          <span className="stat-number">
+            <CountUp from={0} to={numLikes} duration={2.2} decimals={0} startCounting={started} />
+          </span>
+          <span className="stat-unit">videos</span>
+        </div>
+        <p className="stat-body">a like</p>
+        <p className="stat-subtext">
+          You enjoyed only every <strong><CountUp from={0} to={freqLikes} duration={1.8} decimals={0} startCounting={started} />th</strong> video on average
+        </p>
+        <span className="stat-deco" aria-hidden>💔</span>
+      </div>
+    </div>
+  );
+}
+
+/* 11. Summary --------------------------------------------------------------- */
 export function SummarySlide({ user }) {
   const started = useStarted(200);
-  const { profile, activity } = user;
+  const { profile, activity, likes, comments } = user;
   const wk = activity.avergae_time_per_weekday;
 
-  const cards = [
-    {
-      label: "Days on TikTok",
-      value: (activity.watch_time_secs / 86400).toFixed(1),
-      suffix: "d",
-      color: "#ac47ea",
-    },
-    {
-      label: "Videos watched",
-      value: activity.vids_watched.toLocaleString(),
-      color: "#69C9D0",
-    },
-    {
-      label: "Watch sessions",
-      value: activity.num_watch_sessions_one_year.toLocaleString(),
-      color: "#ff8c42",
-    },
-    {
-      label: "Longest binge",
-      value: (activity.longest_watch_session?.duration_as_secs / 3600).toFixed(1),
-      suffix: "h",
-      color: "#FF004F",
-    },
-    {
-      label: "Most active day",
-      value: (activity.most_time_spend_on_tiktok_day.duration_as_secs / 3600).toFixed(1),
-      suffix: "h",
-      color: "#0011ff",
-    },
-    {
-      label: "Avg. per video",
-      value: activity.average_time_per_vid.toFixed(1),
-      suffix: "s",
-      color: "#ffd166",
-    },
-    {
-      label: "Best weekday",
-      value: wk.highest_day,
-      color: "#06d6a0",
-    },
-    {
-      label: "Avg. Session length",
-      value: ((activity.watch_time_secs / activity.num_watch_sessions_one_year) / 60).toFixed(0),
-      suffix: "min",
-      color: "#64a2e4",
-    },
-    {
-      label: "Avg. daily watchtime",
-      value: (((activity.watch_time_secs / 60. / 60. / 24.) / 365.)* 24.).toFixed(1),
-      suffix: "h",
-      color: "#ea02f6",
-    },
-  ];
+const cards = [
+  {
+    label: "Days on TikTok",
+    value: (activity.watch_time_secs / 86400).toFixed(1),
+    suffix: "d",
+    color: "#7C3AED", 
+  },
+  {
+    label: "Videos watched",
+    value: activity.vids_watched.toLocaleString(),
+    color: "#06B6D4", 
+  },
+  {
+    label: "Watch sessions",
+    value: activity.num_watch_sessions_one_year.toLocaleString(),
+    color: "#F97316", 
+  },
+  {
+    label: "Longest binge",
+    value: (activity.longest_watch_session?.duration_as_secs / 3600).toFixed(1),
+    suffix: "h",
+    color: "#EF4444", 
+  },
+  {
+    label: "Most active day",
+    value: (activity.most_time_spend_on_tiktok_day.duration_as_secs / 3600).toFixed(1),
+    suffix: "h",
+    color: "#3B82F6", 
+  },
+  {
+    label: "Avg. per video",
+    value: activity.average_time_per_vid.toFixed(1),
+    suffix: "s",
+    color: "#EAB308", 
+  },
+  {
+    label: "Best weekday",
+    value: wk.highest_day,
+    color: "#10B981", 
+  },
+  {
+    label: "Avg. Session length",
+    value: ((activity.watch_time_secs / activity.num_watch_sessions_one_year) / 60).toFixed(0),
+    suffix: "min",
+    color: "#60A5FA", 
+  },
+  {
+    label: "Avg. daily watchtime",
+    value: (((activity.watch_time_secs / 60. / 60. / 24.) / 365.) * 24.).toFixed(1),
+    suffix: "h",
+    color: "#C026D3", 
+  },
+  {
+    label: "Comments written",
+    value: (comments.num_of_comments),
+    suffix: "",
+    color: "#F472B6", 
+  },
+  {
+    label: "Videos liked",
+    value: (likes.count_liked_vids),
+    suffix: "",
+    color: "#FB923C", 
+  },
+  {
+    label: "Videos shared",
+    value: ("todo"),
+    suffix: "",
+    color: "#34D399",
+  },
+];
 
   return (
     <div className="slide slide-summary">
@@ -434,5 +510,7 @@ export const slides = [
   BestDaySlide,
   WeekdaySlide,
   AvgVideoSlide,
+  CommentSlide,
+  LikeSlide,
   SummarySlide,
 ];
