@@ -4,6 +4,7 @@ import Slideshow from "./components/Slideshow";
 import "./App.css";
 
 import FAQ from "./components/FAQ";
+import JSZip from "jszip";
 
 export default function App() {
   const [user, setUser]       = useState(null);
@@ -13,14 +14,31 @@ export default function App() {
 
   const processFile = async (file) => {
     if (!file) return;
-    if (!file.name.endsWith(".json")) {
-      setError("That doesn't look like a JSON file. Try again.");
+
+    const isJson = file.name.endsWith(".json");
+    const isZip =  file.name.endsWith(".zip");
+    if (!isJson && !isZip) {
+      setError("That doesn't look like a JSON or ZIP file. Try again.");
       return;
     }
     setLoading(true);
     setError(null);
+
     try {
-      const text   = await file.text();
+      let text;
+      if (isZip) {
+        const zip = await JSZip.loadAsync(file);
+        // TikTok nennt die Datei "user_data.json" im ZIP
+        const jsonFile = zip.file("user_data_tiktok.json");
+        if (!jsonFile) {
+          setError("Couldn't find user_data_tiktok.json in the ZIP. Make sure it's your TikTok export.");
+          return;
+        }
+        text = await jsonFile.async("string");
+      } else {
+        text = await file.text();
+      }
+      
       const result = parse_data(text);
       setUser(result);
     } catch (e) {
@@ -73,7 +91,7 @@ export default function App() {
         </p>
 
         <label className="upload-btn">
-          <input type="file" accept=".json" onChange={handleFile} hidden />
+          <input type="file" accept=".json,.zip" onChange={handleFile} hidden />
           {loading
             ? <span className="loading-dots">Parsing<span>.</span><span>.</span><span>.</span></span>
             : "Choose File"}
